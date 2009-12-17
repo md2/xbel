@@ -56,6 +56,21 @@ class XBEL(object):
     def loadOpera(self, infile):
         title = infile.readline().rstrip('\r\n')
         self.addTextElement('title', title)
+        self.addStartElement('info')
+        self.addStartElement('metadata')
+        self.addAttribute('owner', 'Mozilla')
+        self.addAttribute('SyncPlaces', 'true')
+        self.addAttribute('BookmarksToolbarFolder', 'default')
+        self.addEndElement()
+        self.addEndElement()
+        self.addStartElement('folder')
+        self.addAttribute('id', 'default')
+        self.addEndElement()
+
+        def generator():
+            for id in xrange(sys.maxint):
+                yield 'id%d' % (id)
+        id = generator()
 
         bookmark = False
         folder = 0
@@ -92,9 +107,11 @@ class XBEL(object):
                     bookmark = False
                 if line == '#FOLDER':
                     self.addStartElement('folder')
+                    self.addAttribute('id', id.next())
                     folder += 1
                 elif line == '#URL':
                     self.addStartElement('bookmark')
+                    self.addAttribute('id', id.next())
                     bookmark = True
                 elif line == '-':
                     self.addEndElement()
